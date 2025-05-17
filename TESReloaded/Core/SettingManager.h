@@ -20,4 +20,5 @@ public:
 	static bool		SunLight;
 	static bool		VisualSun;
 	static bool		SkipRenderPass;
+	static bool		UseFixedFunction;
 };

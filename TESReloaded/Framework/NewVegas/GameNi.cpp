@@ -1,5 +1,13 @@
 #include "GameNi.h"
 
+ShadowSceneNode* BSShaderManager::GetShadowSceneNode(UInt32 aeType) {
+    return ((ShadowSceneNode**)0x11F91C8)[aeType];
+}
+
+NiDX9Renderer* BSShaderManager::GetRenderer() {
+    return *(NiDX9Renderer**)0x11F9508;
+}
+
 void NiPoint3::GetLookAt(NiPoint3* LookAt, NiPoint3* Rotation) {
     float x, y, z, r;
     
@@ -91,7 +99,7 @@ void	SceneGraph::SetNearDistance(float Distance) {
 }
 
 NiProperty*	 NiGeometry::GetProperty(NiProperty::PropertyType Type) {
-    return propertyState.prop[Type];
+    return propertyState.m_aspProps[Type];
 }
 
 
