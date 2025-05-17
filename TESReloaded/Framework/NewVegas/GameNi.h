@@ -90,6 +90,15 @@ public:
 };
 static_assert(sizeof(NiPoint3) == 0x00C);
 
+class NiPoint4 {
+public:
+	float x;
+	float y;
+	float z;
+	float w;
+};
+static_assert(sizeof(NiPoint4) == 0x10);
+
 class NiVector4 {
 public:
 	void Normalize();
@@ -2709,3 +2718,62 @@ public:
 	bool bRecurseToGeometry;
 };
 static_assert(offsetof(BSCullingProcess, kCullMode) == 0x90);
+
+class BSShaderManager {
+public:
+	enum SceneGraphType : UInt32 {
+		BSSM_SSN_WORLD = 0,
+		BSSM_SSN_MENU_OBJECT_3D = 1,
+		BSSM_SSN_UNK_2 = 2,
+		BSSM_SSN_MENU_PLAYER_3D = 3,
+		BSSM_SSN_COUNT = 4,
+	};
+
+	enum ShaderType : UInt32 {
+		BSSM_SHADER_DEFAULT = 0,
+		BSSM_SHADER_SHADOWLIGHT = 1,
+		BSSM_SHADER_TALL_GRASS = 2,
+		BSSM_SHADER_DISTANT_LOD = 3,
+		BSSM_SHADER_ST_BRANCH = 4,
+		BSSM_SHADER_ST_FROND = 5,
+		BSSM_SHADER_ST_LEAF = 6,
+		BSSM_SHADER_BLOOD_SPLATTER = 7,
+		BSSM_SHADER_DISTANT_TREE = 8,
+		BSSM_SHADER_DEBUG = 9,
+		BSSM_SHADER_SKY = 10,
+		//							  11
+		//							  12
+		BSSM_SHADER_HAIR = 13,
+		BSSM_SHADER_SKIN = 14,
+		BSSM_SHADER_PARALLAX = 15,
+		BSSM_SHADER_GEOM_DECAL = 16,
+		BSSM_SHADER_WATER = 17,
+		// 						      18
+		// 						      19
+		// 						      20
+		// 						      21
+		// 						      22
+		// 						      23
+		BSSM_SHADER_PARTICLE = 24,
+		BSSM_SHADER_BOLT = 25,
+		BSSM_SHADER_BEAM = 26,
+		//							  27,
+		//							  28,
+		BSSM_SHADER_LIGHTING30 = 29,
+		BSSM_SHADER_PRECIPITATION = 30,
+		// 						      31
+		BSSM_SHADER_TILE = 32,
+		BSSM_SHADER_NOLIGHTING = 33,
+		BSSM_SHADER_VOLUMETRIC_FOG = 34
+	};
+
+	static float* const fDepthBias;
+	static float* const fLODLandDrop;
+	static NiPoint3* const kCameraPos;
+	static NiPoint4* const kLoadedRange;
+
+	static BSShader** pspShaders;
+
+	static ShadowSceneNode* GetShadowSceneNode(UInt32 aeType);
+	static NiDX9Renderer* GetRenderer();
+};

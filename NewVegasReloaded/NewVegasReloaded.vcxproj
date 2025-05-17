@@ -78,7 +78,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>dxguid.lib;version.lib;$(SolutionDir)lib\Release\libMinHook.x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;version.lib;$(SolutionDir)lib\Debug\libMinHook.x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,8 +113,10 @@
     <ClCompile Include="..\TESReloaded\Core\Hooks\GameCommon.cpp" />
     <ClInclude Include="..\TESReloaded\Core\Hooks\GameCommon.h" />
     <ClCompile Include="..\TESReloaded\Core\Hooks\NewVegas\Culling.cpp" />
+    <ClCompile Include="..\TESReloaded\Core\Hooks\NewVegas\Device.cpp" />
     <ClCompile Include="..\TESReloaded\Core\Hooks\NewVegas\Game.cpp" />
     <ClInclude Include="..\TESReloaded\Core\Hooks\NewVegas\Culling.h" />
+    <ClInclude Include="..\TESReloaded\Core\Hooks\NewVegas\Device.h" />
     <ClInclude Include="..\TESReloaded\Core\Hooks\NewVegas\Game.h" />
     <ClCompile Include="..\TESReloaded\Core\Hooks\NewVegas\Hooks.cpp" />
     <ClInclude Include="..\TESReloaded\Core\Hooks\NewVegas\Hooks.h" />

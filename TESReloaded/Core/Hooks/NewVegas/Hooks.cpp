@@ -33,9 +33,7 @@ void AttachHooks() {
 	MH_CreateHookSimple((LPVOID*)&NewTES, NewTESHook);
 	MH_CreateHookSimple((LPVOID*)&NewMenuInterfaceManager, NewMenuInterfaceManagerHook);
 
-	if (SettingManager::SkipRenderPass) {
-		AttachRenderHooks();
-	}
+	AttachRenderHooks();
 
 	if (SettingManager::PassLights) {
 		AttachLightHooks();
