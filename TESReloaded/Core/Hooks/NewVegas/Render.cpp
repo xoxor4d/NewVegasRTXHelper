@@ -219,7 +219,7 @@ __declspec(naked) void on_render_skinned_stub()
 		mov		render_skinned, 1;
 		call	func_addr;
 		mov		render_skinned, 0;
-		mov 	curr_bone_idx, 0;
+		mov 	ff_curr_bone_idx, 0;
 		jmp		retn_addr;
 	}
 }
@@ -231,7 +231,7 @@ __declspec(naked) void reset_bones_stub()
 	__asm
 	{
 		call	func_addr;
-		mov 	curr_bone_idx, 0;
+		mov 	ff_curr_bone_idx, 0;
 		jmp		retn_addr;
 	}
 }

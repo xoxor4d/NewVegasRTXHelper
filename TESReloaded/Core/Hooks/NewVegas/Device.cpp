@@ -1,5 +1,7 @@
 #include "Device.h"
 #include <iostream>
+
+#include "Render.h"
 #pragma region D3D9Device
 
 #define D3DXCONSTTABLE_LARGEADDRESSAWARE
@@ -641,8 +643,8 @@ HRESULT d3d9ex::D3D9Device::SetVertexShaderConstantF(UINT StartRegister, CONST f
 			D3DXMATRIX temp;
 			matrix3x4_transpose_to_4x4(&bone_transform, &temp, 1);
 
-			m_pIDirect3DDevice9->SetTransform(D3DTS_WORLDMATRIX(curr_bone_idx), &temp);
-			curr_bone_idx++;
+			m_pIDirect3DDevice9->SetTransform(D3DTS_WORLDMATRIX(ff_curr_bone_idx), &temp);
+			ff_curr_bone_idx++;
 		}
 		//else
 		//{
