@@ -1,0 +1,51 @@
+name: Build-Release
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: Build binary
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        configuration:
+          - Release
+
+    steps:
+      - name: Wait for previous workflows
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/turnstyle@v1
+        with:
+          poll-interval-seconds: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check out files
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          lfs: false
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Set up problem matching
+        uses: ammaraskar/msvc-problem-matcher@master
+
+      - name: Build ${{matrix.configuration}}-binaries-newvegas-rtx-helper
+        run: msbuild /m /v:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=Win32 NewVegasRTXHelper.sln
+
+      - name: Move build files 
+        run: |
+          move build/bin/${{matrix.configuration}}/NewVegasRTXLight.dll ./assets/Data/NVSE/Plugins/
+          move build/bin/${{matrix.configuration}}/NewVegasRTXLight.pdb ./assets/Data/NVSE/Plugins/
+
+      - name: Upload ${{matrix.configuration}}-binaries-newvegas-rtx-helper
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{matrix.configuration}}-binaries-newvegas-rtx-helper
+          include-hidden-files: true
+          path: |
+            ./assets/
