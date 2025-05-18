@@ -589,6 +589,11 @@ bool get_constant_name(IDirect3DDevice9* dev, UINT start_register)
 						return true;
 					}
 
+					/*if (name == "EyePosition") {
+						ff_skip_mesh = true;
+						return false;
+					}*/
+
 					/*if (name == "ModelViewProj") {
 						return true;
 					}*/
@@ -631,38 +636,21 @@ HRESULT d3d9ex::D3D9Device::SetVertexShaderConstantF(UINT StartRegister, CONST f
 {
 	//const auto& im = imgui::get();
 
-	if (render_skinned)
+	//const auto nn = get_constant_name(m_pIDirect3DDevice9, StartRegister);
+
+	if (render_skinned /*&& get_constant_name(m_pIDirect3DDevice9, StartRegister)*/)
 	{
-		auto x = get_constant_name(m_pIDirect3DDevice9, StartRegister);
-		if (Vector4fCount == 3)
+		if (Vector4fCount == 3 /*&& StartRegister >= 44 && StartRegister <= 98*/) // should always be bones - if not - use get_constant_name
 		{
 			float3x4 bone_transform = {};
 			memcpy(&bone_transform, pConstantData, 3 * sizeof(float) * 4);
-			int breakme = 0;
-
+			
 			D3DXMATRIX temp;
 			matrix3x4_transpose_to_4x4(&bone_transform, &temp, 1);
 
 			m_pIDirect3DDevice9->SetTransform(D3DTS_WORLDMATRIX(ff_curr_bone_idx), &temp);
 			ff_curr_bone_idx++;
 		}
-		//else
-		//{
-		//	//if (Vector4fCount >= 4)
-		//	{
-		//		const auto num_mats = Vector4fCount / 4u;
-
-		//		D3DXMATRIX temp;
-		//		memcpy(&temp, pConstantData, Vector4fCount * sizeof(float) * 4/*num_mats * sizeof(D3DXMATRIX)*/);
-		//		int breakme = 0;
-
-		//		/*for (int i = 0; i < num_mats; i++) {
-		//			m_pIDirect3DDevice9->SetTransform(D3DTS_WORLDMATRIX(i), &temp);
-		//		}*/
-
-		//		//m_pD3DDevice->SetTransform(D3DTS_WORLDMATRIX(i), (D3DMATRIX*)&mat);
-		//	}
-		//}
 	}
 
 	return m_pIDirect3DDevice9->SetVertexShaderConstantF(StartRegister, pConstantData, Vector4fCount);

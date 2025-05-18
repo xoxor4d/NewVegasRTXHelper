@@ -6,7 +6,7 @@ static RenderListAdd RenderListOrig = (RenderListAdd)0xBA9EE0;
 
 void __fastcall RenderListHook(void* ecx, void* edx, void* triStrips, WORD renderPassNum, BYTE enable, BYTE numLights, ShadowSceneLight* light0, ShadowSceneLight* light1, ShadowSceneLight* light2, ShadowSceneLight* light3) {
 	// Block render passes to avoid confusing remix
-	switch (renderPassNum) {
+	switch (renderPassNum) { 
 		// Normals
 		case BSSM_DIFFUSEDIR_S:
 		case BSSM_DIFFUSEPT2:
@@ -51,6 +51,7 @@ bool render_skinned = false;
 bool render_blended = false;
 
 UINT ff_curr_bone_idx = 0u;
+bool ff_skip_mesh = false;
 
 void pre_drawindexedprim()
 {
@@ -58,10 +59,18 @@ void pre_drawindexedprim()
 	//auto x = &TheRenderManager->PrePackObjects;
 	bool force_world_transform = false;
 
-	/*if (render_blended)
+	if (ff_skip_mesh) {
+		return;
+	}
+
+	const auto ren = BSShaderManager::GetRenderer();
+	
+	// do not render anything 2D with FF
+	if (ren->projMatrix.m[3][3] == 1.0f &&
+		ren->projMatrix.m[2][3] == 0.0f)
 	{
-		int x = 1;
-	}*/
+		return;
+	}
 
 	if (render_skinned && ff_curr_bone_idx)
 	{
@@ -149,7 +158,6 @@ void pre_drawindexedprim()
 		int x = 1;
 #endif
 
-		const auto ren = BSShaderManager::GetRenderer();
 		//if (TheSettingManager->SettingsMain.Remix.FixedFunctionLit)
 		{
 
@@ -186,6 +194,7 @@ void post_drawindexedprim()
 		//curr_bone_idx = 0u;
 	//}
 
+	ff_skip_mesh = false;
 	ff_was_modified = false;
 	ff_use_shader = false;
 }
@@ -238,8 +247,8 @@ __declspec(naked) void reset_bones_stub()
 
 __declspec(naked) void on_blended_emissive_stub()
 {
-	static uint32_t func_addr = 0xB650C0;
-	static uint32_t retn_addr = 0xB65C53;
+	static uint32_t func_addr = 0xB9AF60;
+	static uint32_t retn_addr = 0xB651B6;
 	__asm
 	{
 		mov 	render_blended, 1;
@@ -258,17 +267,16 @@ void AttachRenderHooks()
 		MH_CreateHookSimple((LPVOID*)&RenderListOrig, RenderListHook);
 	}
 
-	// xo - hook d3d device interface
-	AttachDeviceHooks();
-
 	// xo - render static meshes with fixed function
 	if (SettingManager::UseFixedFunction) 
 	{
+		AttachDeviceHooks(); // hook d3d device interface
+
 		SafeWriteJump(0xB995E8, (UInt32)on_render_lit_surfs_stub);
 		SafeWriteJump(0xB99598, (UInt32)on_render_skinned_stub);
 		SafeWriteJump(0xB991E7, (UInt32)reset_bones_stub);
 		SafeWrite8(0xB992F2, 0xEB); // fix broken skinning
 
-		SafeWriteJump(0x8741DB, (UInt32)on_blended_emissive_stub);
+		SafeWriteJump(0xB651B1, (UInt32)on_blended_emissive_stub); // crashing
 	}
 }
