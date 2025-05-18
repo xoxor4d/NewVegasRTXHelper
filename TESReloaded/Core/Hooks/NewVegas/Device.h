@@ -1,13 +1,14 @@
 #pragma once
 
+#if 1
 #pragma warning(push)
 #pragma warning(disable: 26495)
 #include <d3d9.h>
-#include <d3dx9.h>
+//#include <d3dx9.h>
 #pragma warning(pop)
 
 #pragma comment(lib, "d3d9.lib")
-#pragma comment(lib, "d3dx9.lib")
+//#pragma comment(lib, "d3dx9.lib")
 
 class d3d9ex final
 {
@@ -174,6 +175,7 @@ private:
 		IDirect3D9* m_pIDirect3D9;
 	};
 
+#if 0
 	public:
 	class _d3d9ex final : public IDirect3D9Ex
 	{
@@ -207,6 +209,8 @@ private:
 	private:
 		IDirect3D9Ex* m_pIDirect3D9Ex;
 	};
+#endif
 };
 
 void AttachDeviceHooks();
+#endif

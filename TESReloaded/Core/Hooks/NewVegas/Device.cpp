@@ -1,10 +1,12 @@
+#if 1
+
 #include "Device.h"
 #include <iostream>
 
 #include "Render.h"
 #pragma region D3D9Device
 
-#define D3DXCONSTTABLE_LARGEADDRESSAWARE
+//#define D3DXCONSTTABLE_LARGEADDRESSAWARE
 
 HRESULT d3d9ex::D3D9Device::QueryInterface(REFIID riid, void** ppvObj)
 {
@@ -589,6 +591,10 @@ bool get_constant_name(IDirect3DDevice9* dev, UINT start_register)
 						return true;
 					}
 
+					/*if (name.find("horizo") != std::string::npos) {
+						return true;
+					}*/
+
 					/*if (name == "EyePosition") {
 						ff_skip_mesh = true;
 						return false;
@@ -635,7 +641,6 @@ void matrix3x4_transpose_to_4x4(const float3x4* input, D3DXMATRIX* output, const
 HRESULT d3d9ex::D3D9Device::SetVertexShaderConstantF(UINT StartRegister, CONST float* pConstantData, UINT Vector4fCount)
 {
 	//const auto& im = imgui::get();
-
 	//const auto nn = get_constant_name(m_pIDirect3DDevice9, StartRegister);
 
 	if (render_skinned /*&& get_constant_name(m_pIDirect3DDevice9, StartRegister)*/)
@@ -892,6 +897,7 @@ HRESULT __stdcall d3d9ex::_d3d9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceTyp
 
 #pragma endregion
 
+#if 0
 #pragma region _D3D9Ex
 
 HRESULT __stdcall d3d9ex::_d3d9ex::QueryInterface(REFIID riid, void** ppvObj)
@@ -1017,6 +1023,7 @@ HRESULT __stdcall d3d9ex::_d3d9ex::GetAdapterLUID(UINT Adapter, LUID* pLUID)
 	return (m_pIDirect3D9Ex->GetAdapterLUID(Adapter, pLUID));
 }
 #pragma endregion
+#endif
 
 IDirect3D9* __stdcall direct3d_create9_stub(UINT sdk)
 {
@@ -1024,21 +1031,21 @@ IDirect3D9* __stdcall direct3d_create9_stub(UINT sdk)
 	return (new d3d9ex::_d3d9(Direct3DCreate9(sdk)));
 }
 
-HRESULT __stdcall direct3d_create9ex_stub(UINT sdk, IDirect3D9Ex** out)
-{
-	std::cout << "[D3D9] Game is invoking 'Direct3DCreate9Ex'. Creating proxy interface.\n";
-
-	HRESULT hr;
-	IDirect3D9Ex* d3d9ex = nullptr;
-	if (hr = Direct3DCreate9Ex(sdk, &d3d9ex); SUCCEEDED(hr))
-	{
-		*out = (new d3d9ex::_d3d9ex(d3d9ex));
-		return hr;
-	}
-
-	out = nullptr;
-	return hr;
-}
+//HRESULT __stdcall direct3d_create9ex_stub(UINT sdk, IDirect3D9Ex** out)
+//{
+//	std::cout << "[D3D9] Game is invoking 'Direct3DCreate9Ex'. Creating proxy interface.\n";
+//
+//	HRESULT hr;
+//	IDirect3D9Ex* d3d9ex = nullptr;
+//	if (hr = Direct3DCreate9Ex(sdk, &d3d9ex); SUCCEEDED(hr))
+//	{
+//		*out = (new d3d9ex::_d3d9ex(d3d9ex));
+//		return hr;
+//	}
+//
+//	out = nullptr;
+//	return hr;
+//}
 
 __declspec(naked) void d3d_create9_stub()
 {
@@ -1050,22 +1057,23 @@ __declspec(naked) void d3d_create9_stub()
 	}
 }
 
-__declspec(naked) void d3d_create9ex_stub()
-{
-	static uint32_t retn_addr = 0xE69492;
-	__asm
-	{
-		push    ecx;
-		push	32; // sdk version
-		call	direct3d_create9ex_stub;
-		//mov     esi, eax;
-		jmp		retn_addr;
-	}
-}
+//__declspec(naked) void d3d_create9ex_stub()
+//{
+//	static uint32_t retn_addr = 0xE69492;
+//	__asm
+//	{
+//		push    ecx;
+//		push	32; // sdk version
+//		call	direct3d_create9ex_stub;
+//		//mov     esi, eax;
+//		jmp		retn_addr;
+//	}
+//}
 
 void AttachDeviceHooks()
 {
-	SafeWriteJump(0xE6948D, (UInt32)d3d_create9ex_stub);
+	//SafeWriteJump(0xE6948D, (UInt32)d3d_create9ex_stub);
 	SafeWriteNop(0xE694D0, 6);
 	SafeWriteJump(0xE694D0, (UInt32)d3d_create9_stub);
 }
+#endif
