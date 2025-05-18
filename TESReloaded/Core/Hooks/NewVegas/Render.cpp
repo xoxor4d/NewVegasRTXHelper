@@ -189,16 +189,16 @@ __declspec(naked) void on_render_lit_surfs_stub()
 	static uint32_t retn_addr = 0xB995F5;
 	__asm
 	{
+		pushad;
 		mov		render_static, 1;
-
-		mov     eax, [esp + 0x18];
-		push    ecx;
-		push    edx;
-		push    eax;
-		push    esi;
+		popad;
+		
 		call	func_addr;
 
+		pushad;
 		mov		render_static, 0;
+		popad;
+
 		jmp		retn_addr;
 	}
 }
@@ -256,7 +256,7 @@ void AttachRenderHooks()
 	{
 		AttachDeviceHooks(); // hook d3d device interface
 
-		SafeWriteJump(0xB995E8, (UInt32)on_render_lit_surfs_stub);
+		SafeWriteJump(0xB995F0, (UInt32)on_render_lit_surfs_stub);
 		SafeWriteJump(0xB99598, (UInt32)on_render_skinned_stub);
 		SafeWriteJump(0xB991E7, (UInt32)reset_bones_stub);
 		SafeWrite8(0xB992F2, 0xEB); // fix broken skinning
