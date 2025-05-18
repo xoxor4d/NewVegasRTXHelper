@@ -99,7 +99,7 @@ void	SceneGraph::SetNearDistance(float Distance) {
 }
 
 NiProperty*	 NiGeometry::GetProperty(NiProperty::PropertyType Type) {
-    return propertyState.prop[Type];
+    return propertyState.m_aspProps[Type];
 }
 
 

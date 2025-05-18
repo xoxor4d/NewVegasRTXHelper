@@ -56,7 +56,6 @@ bool ff_skip_mesh = false;
 void pre_drawindexedprim()
 {
 	const auto& dev = TheRenderManager->device;
-	//auto x = &TheRenderManager->PrePackObjects;
 	bool force_world_transform = false;
 
 	if (ff_skip_mesh) {
@@ -65,35 +64,28 @@ void pre_drawindexedprim()
 
 	const auto ren = BSShaderManager::GetRenderer();
 	
-	// do not render anything 2D with FF
+	// do not render anything 2D via FF
 	if (ren->projMatrix.m[3][3] == 1.0f &&
 		ren->projMatrix.m[2][3] == 0.0f)
 	{
 		return;
 	}
 
-	if (render_skinned && ff_curr_bone_idx)
-	{
-		//if (TheSettingManager->SettingsMain.Remix.FixedFunctionLit)
-		{
-			//if (/*true || curr_bone_idx */)
-			{
-				dev->SetRenderState(D3DRS_VERTEXBLEND, D3DVBF_3WEIGHTS);
-				dev->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE, TRUE);
-				//dev->SetTransform(D3DTS_WORLDMATRIX(i), (D3DMATRIX*)&mat);
-			}
-			/*else
-			{
-				force_world_transform = true;
-			}*/
-		}
-	}
-	else
-	{
-		dev->SetRenderState(D3DRS_VERTEXBLEND, D3DVBF_DISABLE);
-		dev->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE, FALSE);
+	// do not render sky via FF
+	if (ren->m_pkCurrProp && ren->m_pkCurrProp->m_spShadeProperty && ren->m_pkCurrProp->m_spShadeProperty->m_eShaderType == NiShadeProperty::kProp_Sky) {
+		return;
 	}
 
+	if (render_skinned && ff_curr_bone_idx)
+	{
+		dev->SetRenderState(D3DRS_VERTEXBLEND, D3DVBF_3WEIGHTS);
+		dev->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE, TRUE);
+	}
+	else
+	{	// could prob. be removed
+		dev->SetRenderState(D3DRS_VERTEXBLEND, D3DVBF_DISABLE); 
+		dev->SetRenderState(D3DRS_INDEXEDVERTEXBLENDENABLE, FALSE);
+	}
 
 	if (render_static || render_skinned || render_blended)
 	{
@@ -157,25 +149,17 @@ void pre_drawindexedprim()
 		vertex_decl->GetDeclaration((D3DVERTEXELEMENT9*)decl, &numElements);
 		int x = 1;
 #endif
+		dev->GetVertexShader(&ff_og_shader);
+		dev->SetVertexShader(nullptr);
+		ff_was_modified = true;
 
-		//if (TheSettingManager->SettingsMain.Remix.FixedFunctionLit)
-		{
-
-			dev->GetVertexShader(&ff_og_shader);
-			dev->SetVertexShader(nullptr);
-			ff_was_modified = true;
-
-			if (render_static || force_world_transform) {
-				dev->SetTransform(D3DTS_WORLD, &ren->worldMatrix);
-			}
-
-			dev->SetTransform(D3DTS_VIEW, &ren->viewMatrix);
-			dev->SetTransform(D3DTS_PROJECTION, &ren->projMatrix);
+		if (render_static || force_world_transform) {
+			dev->SetTransform(D3DTS_WORLD, &ren->worldMatrix);
 		}
-		/*else
-		{
-			dev->SetTransform(D3DTS_WORLD, &IDENTITY);
-		}*/
+
+		// would prob. be better to set these on the start of a frame but this also works
+		dev->SetTransform(D3DTS_VIEW, &ren->viewMatrix);
+		dev->SetTransform(D3DTS_PROJECTION, &ren->projMatrix);
 	}
 }
 
@@ -277,6 +261,6 @@ void AttachRenderHooks()
 		SafeWriteJump(0xB991E7, (UInt32)reset_bones_stub);
 		SafeWrite8(0xB992F2, 0xEB); // fix broken skinning
 
-		SafeWriteJump(0xB651B1, (UInt32)on_blended_emissive_stub); // crashing
+		SafeWriteJump(0xB651B1, (UInt32)on_blended_emissive_stub); // blended / emissive / foliage / effects
 	}
 }
